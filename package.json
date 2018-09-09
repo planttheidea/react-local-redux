@@ -1,15 +1,14 @@
 {
   "author": "tony.quetano@planttheidea.com",
   "ava": {
-    "babel": "inherit",
     "failFast": true,
     "files": [
-      "./test/utils.js",
-      "./test/index.js"
+      "./test/*.js"
     ],
     "require": [
       "@babel/register"
-    ]
+    ],
+    "verbose": true
   },
   "bugs": {
     "url": "https://github.com/planttheidea/react-local-redux/issues"
@@ -24,7 +23,7 @@
     "@babel/preset-env": "^7.0.0",
     "@babel/preset-react": "^7.0.0",
     "@babel/register": "^7.0.0",
-    "ava": "^0.25.0",
+    "ava": "^1.0.0-beta.8",
     "babel-eslint": "^9.0.0",
     "babel-loader": "^8.0.2",
     "babel-preset-minify": "^0.4.3",

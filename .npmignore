@@ -1,5 +1,5 @@
 .idea
-.nyc_config
+.nyc_output
 coverage
 DEV_ONLY
 node_modules

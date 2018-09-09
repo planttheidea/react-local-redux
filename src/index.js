@@ -5,7 +5,7 @@ import {connectLocal} from './connectLocal';
 import {
   createActionCreator,
   createReducer,
-} from './helpers';
+} from './helperMethods';
 
 export {
   connectLocal, createActionCreator, createReducer,
