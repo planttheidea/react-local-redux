@@ -38,7 +38,7 @@ export const createActionCreator = (type, payloadHandler = identity, metaHandler
       action.payload = payload;
 
       if (payload instanceof Error) {
-        action.isError = true;
+        action.error = true;
       }
     }
 

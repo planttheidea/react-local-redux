@@ -67,7 +67,7 @@ test('if createActionCreator will create an actionCreator with default handlers 
   const result = actionCreator(...args);
 
   t.deepEqual(result, {
-    isError: true,
+    error: true,
     payload: args[0],
     type,
   });
