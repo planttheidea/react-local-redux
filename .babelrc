@@ -1,0 +1,79 @@
+{
+  "env": {
+    "development": {
+      "presets": [
+        [
+          "@babel/env",
+          {
+            "loose": true,
+            "modules": false
+          }
+        ],
+        "@babel/react"
+      ],
+      "plugins": [
+        "@babel/plugin-proposal-class-properties",
+        "@babel/plugin-syntax-class-properties"
+      ]
+    },
+    "es": {
+      "presets": [
+        [
+          "@babel/env",
+          {
+            "loose": true,
+            "modules": false
+          }
+        ]
+      ],
+      "plugins": [
+        "@babel/plugin-proposal-class-properties",
+        "@babel/plugin-syntax-class-properties"
+      ]
+    },
+    "lib": {
+      "presets": [
+        [
+          "@babel/env",
+          {
+            "loose": true
+          }
+        ]
+      ],
+      "plugins": [
+        "@babel/plugin-proposal-class-properties",
+        "@babel/plugin-syntax-class-properties"
+      ]
+    },
+    "production": {
+      "presets": [
+        [
+          "@babel/env",
+          {
+            "loose": true,
+            "modules": false
+          }
+        ],
+        "minify"
+      ],
+      "plugins": [
+        "@babel/plugin-proposal-class-properties",
+        "@babel/plugin-syntax-class-properties"
+      ]
+    },
+    "test": {
+      "presets": [
+        [
+          "@babel/env",
+          {
+            "loose": true
+          }
+        ]
+      ],
+      "plugins": [
+        "@babel/plugin-proposal-class-properties",
+        "@babel/plugin-syntax-class-properties"
+      ]
+    }
+  }
+}

@@ -1,0 +1,76 @@
+{
+  "author": "tony.quetano@planttheidea.com",
+  "ava": {
+    "babel": "inherit",
+    "failFast": true,
+    "files": [
+      "./test/utils.js",
+      "./test/index.js"
+    ],
+    "require": [
+      "@babel/register"
+    ]
+  },
+  "bugs": {
+    "url": "https://github.com/planttheidea/react-local-redux/issues"
+  },
+  "dependencies": {
+    "fast-equals": "^1.6.0"
+  },
+  "devDependencies": {
+    "@babel/core": "^7.0.0",
+    "@babel/plugin-proposal-class-properties": "^7.0.0",
+    "@babel/polyfill": "^7.0.0",
+    "@babel/preset-env": "^7.0.0",
+    "@babel/preset-react": "^7.0.0",
+    "@babel/register": "^7.0.0",
+    "ava": "^0.25.0",
+    "babel-eslint": "^9.0.0",
+    "babel-loader": "^8.0.2",
+    "babel-preset-minify": "^0.4.3",
+    "case-sensitive-paths-webpack-plugin": "^2.1.2",
+    "eslint": "^5.5.0",
+    "eslint-config-rapid7": "^3.1.0",
+    "eslint-friendly-formatter": "^4.0.1",
+    "eslint-loader": "^2.1.0",
+    "html-webpack-plugin": "^3.2.0",
+    "in-publish": "^2.0.0",
+    "nyc": "^13.0.1",
+    "optimize-js-plugin": "^0.0.4",
+    "react": "^16.5.0",
+    "react-dom": "^16.5.0",
+    "redux-logger": "^3.0.6",
+    "redux-thunk": "^2.3.0",
+    "sinon": "^6.2.0",
+    "webpack": "^4.17.2",
+    "webpack-cli": "^3.1.0",
+    "webpack-dev-server": "^3.1.8"
+  },
+  "homepage": "https://github.com/planttheidea/react-local-redux#readme",
+  "keywords": [],
+  "license": "MIT",
+  "main": "lib/index.js",
+  "module": "es/index.js",
+  "name": "react-local-redux",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/planttheidea/react-local-redux.git"
+  },
+  "scripts": {
+    "build": "NODE_ENV=development webpack --progress --colors --config=webpack/webpack.config.js",
+    "build:minified": "NODE_ENV=production webpack --progress --colors --config=webpack/webpack.config.minified.js",
+    "clean": "rimraf lib && rimraf es && rimraf dist",
+    "dev": "NODE_ENV=development webpack-dev-server --progress --colors --config=webpack/webpack.config.dev.js",
+    "lint": "eslint --max-warnings 0 src",
+    "prepublish": "if in-publish; then npm run prepublish:compile; fi",
+    "prepublish:compile": "npm run lint && npm run test:coverage && npm run clean && npm run transpile:lib && npm run transpile:es && npm run build && npm run build:minified",
+    "start": "npm run dev",
+    "test": "NODE_PATH=. NODE_ENV=test ava",
+    "test:coverage": "nyc --cache npm test",
+    "test:watch": "npm run test -- --watch",
+    "transpile:benchmark": "BABEL_ENV=benchmark babel src --out-dir es",
+    "transpile:es": "BABEL_ENV=es babel src --out-dir es",
+    "transpile:lib": "BABEL_ENV=lib babel src --out-dir lib"
+  },
+  "version": "1.0.0"
+}
