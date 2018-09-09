@@ -7,7 +7,6 @@ import sinon from 'sinon';
 // src
 import * as connect from 'src/connectLocal';
 import {DEFAULT_OPTIONS} from 'src/constants';
-import {createShouldComponentUpdate} from '../src/connectLocal';
 
 test('if createDispatch will create the dispatch method based on the middleware', (t) => {
   const action = {type: 'type'};
