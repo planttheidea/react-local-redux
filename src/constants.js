@@ -1,8 +1,5 @@
 // external dependencies
-import {
-  sameValueZeroEqual,
-  shallowEqual,
-} from 'fast-equals';
+import {shallowEqual} from 'fast-equals';
 
 // utils
 import {getMergedProps} from './utils';
@@ -13,7 +10,7 @@ import {getMergedProps} from './utils';
 export const DEFAULT_OPTIONS = {
   areMergedPropsEqual: shallowEqual,
   areOwnPropsEqual: shallowEqual,
-  areStatesEqual: sameValueZeroEqual,
+  areStatesEqual: shallowEqual,
   mergeProps: getMergedProps,
   middlewares: [],
   pure: true,

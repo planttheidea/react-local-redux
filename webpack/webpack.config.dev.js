@@ -31,6 +31,19 @@ module.exports = Object.assign({}, defaultConfig, {
 
   externals: undefined,
 
+  module: Object.assign({}, defaultConfig.module, {
+    rules: defaultConfig.module.rules.map(
+      (rule) =>
+        rule.loader === 'babel-loader'
+          ? Object.assign({}, rule, {
+            options: Object.assign({}, rule.options, {
+              presets: ['@babel/react'],
+            }),
+          })
+          : rule
+    ),
+  }),
+
   output: Object.assign({}, defaultConfig.output, {
     publicPath: `http://localhost:${PORT}/`,
   }),

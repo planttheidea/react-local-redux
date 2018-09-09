@@ -6,7 +6,9 @@
       "./test/*.js"
     ],
     "require": [
-      "@babel/register"
+      "@babel/register",
+      "@babel/polyfill",
+      "./test/helpers/setup-browser-env.js"
     ],
     "verbose": true
   },
@@ -17,6 +19,7 @@
     "fast-equals": "^1.6.0"
   },
   "devDependencies": {
+    "@babel/cli": "^7.0.0",
     "@babel/core": "^7.0.0",
     "@babel/plugin-proposal-class-properties": "^7.0.0",
     "@babel/polyfill": "^7.0.0",
@@ -27,7 +30,11 @@
     "babel-eslint": "^9.0.0",
     "babel-loader": "^8.0.2",
     "babel-preset-minify": "^0.4.3",
+    "browser-env": "^3.2.5",
     "case-sensitive-paths-webpack-plugin": "^2.1.2",
+    "enzyme": "^3.6.0",
+    "enzyme-adapter-react-16": "^1.5.0",
+    "enzyme-to-json": "^3.3.4",
     "eslint": "^5.5.0",
     "eslint-config-rapid7": "^3.1.0",
     "eslint-friendly-formatter": "^4.0.1",
