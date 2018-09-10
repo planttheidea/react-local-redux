@@ -9,10 +9,6 @@
             "modules": false
           }
         ]
-      ],
-      "plugins": [
-        "@babel/plugin-proposal-class-properties",
-        "@babel/plugin-syntax-class-properties"
       ]
     },
     "es": {
@@ -24,10 +20,6 @@
             "modules": false
           }
         ]
-      ],
-      "plugins": [
-        "@babel/plugin-proposal-class-properties",
-        "@babel/plugin-syntax-class-properties"
       ]
     },
     "lib": {
@@ -38,10 +30,6 @@
             "loose": true
           }
         ]
-      ],
-      "plugins": [
-        "@babel/plugin-proposal-class-properties",
-        "@babel/plugin-syntax-class-properties"
       ]
     },
     "production": {
@@ -54,10 +42,6 @@
           }
         ],
         "minify"
-      ],
-      "plugins": [
-        "@babel/plugin-proposal-class-properties",
-        "@babel/plugin-syntax-class-properties"
       ]
     },
     "test": {

@@ -162,21 +162,22 @@ export const connectLocal = (reducer, actionCreators, options) =>
    * @param {ReactComponent} ComponentToConnect the component being wrapped
    * @returns {ReactComponent} the higher-order component
    */
-  (ComponentToConnect) =>
-    class ConnectedLocalComponent extends Component {
-      static displayName = `ConnectedLocal(${getDisplayName(ComponentToConnect)})`;
+  (ComponentToConnect) => {
+    function ConnectedLocalComponent(initialProps) {
+      Component.call(this, initialProps);
 
-      // state
-      state = reducer(undefined, {});
+      onConstruct(this, reducer, actionCreators, options);
 
-      // lifecycle methods
-      constructor(props) {
-        super(props);
-
-        onConstruct(this, reducer, actionCreators, options);
-      }
-
-      render() {
+      this.render = function() {
         return createElement(ComponentToConnect, this.options.mergeProps(this.state, this.actionCreators, this.props));
-      }
-    };
+      };
+
+      return this;
+    }
+
+    ConnectedLocalComponent.prototype = Object.create(Component.prototype);
+
+    ConnectedLocalComponent.displayName = `ConnectedLocal(${getDisplayName(ComponentToConnect)})`;
+
+    return ConnectedLocalComponent;
+  };
