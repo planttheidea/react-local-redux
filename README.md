@@ -16,7 +16,7 @@ Manage component-specific state as you would global state via redux
 
 The [`redux`](https://github.com/reduxjs/redux) library has changed the way that we manage state within our JavaScript applications, and is a wonderful tool. Like many great tools, though, developers see it as a hammer in a world of nails, using `redux` for all state regardless of whether it should be global or not. The creator of `redux` himself [has even written about how `redux` should be used selectively](https://medium.com/@dan_abramov/you-might-not-need-redux-be46360cf367), because `redux` is meant for global state.
 
-`react-local-redux` tries to strike a balance, leveraging the powers of the `redux` paradigm but keeping state that does not need to be global scoped to the component that it should live in by creating a higher-order component that operates like a local store. It's usage should be natural for those used to using [`react-redux`](https://github.com/reduxjs/react-redux), [`redux` middlewares can be used](#options), and there are even helpers to remove boilerplate related to building [action creators](#createactioncreator) and [reducers](#createreducer).
+`react-local-redux` tries to strike a balance, leveraging the powers of the `redux` paradigm but keeping state that does not need to be global scoped to the component that it should live in by creating a higher-order component that operates like a local store. It's usage should come naturally to those who have used [`react-redux`](https://github.com/reduxjs/react-redux), you can [use `redux` middlewares](#options), and there are even helpers to remove boilerplate related to building [action creators](#createactioncreator) and [reducers](#createreducer).
 
 ## Usage
 
@@ -64,9 +64,9 @@ class App extends Component {
 
 ## connectLocal
 
-`connectLocal(reducer: function, actionCreators: Object[, options: Object]) => (ComponentToWrap: ReactComponent): ReactComponent`
+`connectLocal(reducer: function[, actionCreators: Object[, options: Object]]) => (ComponentToWrap: ReactComponent): ReactComponent`
 
-Decorator that accepts a `reducer` function and a map of functions as `actionCreators`, returning a function that accepts a `ReactComponent` and returns a higher-order `ReactComponent`. Internally the `reducer` will be used as local state, with each of the `actionCreators` being used to update that state. Both the local state and the wrapped `actionCreators` will be passed to the `ComponentToWrap` as props, very much align the lines of `connect` in the `react-redux` package.
+Decorator that accepts a `reducer` function and a map of functions as `actionCreators`, returning a function that accepts a `ReactComponent` and returns a higher-order `ReactComponent`. Internally the `reducer` will be used as local state, with each of the `actionCreators` being used to update that state. Both the local state and the wrapped `actionCreators` will be passed to the `ComponentToWrap` as props, very much align the lines of `connect` in the `react-redux` package. If no `actionCreators` are passed, the `dispatch` method itself will be passed as a prop to the `ComponentToWrap`.
 
 #### options
 
@@ -80,6 +80,11 @@ Like `connect` in `react-redux`, you can pass an object of `options` to customiz
 Additionally, there are some options specific to `connectLocal` that provide more functionality:
 
 - `middlewares` => array of redux middlewares to be appled to the `dispatch` method
+
+```javascript
+@connectLocal(reducer, actionCreators, {middlewares: [reduxThunk]})
+```
+
 - `mergeProps` => custom method to merge state, actionCreators, and props into the props passed to the component
 
 ## Additional imports

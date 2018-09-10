@@ -137,7 +137,11 @@ export const onConstruct = (instance, reducer, actionCreators, options) => {
   instance.dispatch = createDispatch(instance, reducer);
 
   // instance values
-  instance.actionCreators = actionCreators ? getActionCreators(actionCreators, instance.dispatch) : {};
+  instance.actionCreators = actionCreators
+    ? getActionCreators(actionCreators, instance.dispatch)
+    : {
+      dispatch: instance.dispatch,
+    };
 };
 
 /**

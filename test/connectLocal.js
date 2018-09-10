@@ -136,7 +136,7 @@ test('if createShouldComponentUpdate will return true if pure and ownProps chang
   t.true(connect.createShouldComponentUpdate(instance)(nextProps, nextState, nextContext));
 });
 
-test('if createShouldComponentUpdate will return true if pure and state changed', (t) => {
+test('if createShouldComponentUpdate will return true if pur`e` and state changed', (t) => {
   const instance = {
     actionCreators: {},
     context: {},
@@ -292,14 +292,17 @@ test('if onConstruct will assign the appropriate instance values when there are 
 
   connect.onConstruct(instance, reducer, undefined, DEFAULT_OPTIONS);
 
-  const {dispatch, getState, shouldComponentUpdate, ...rest} = instance;
+  const {actionCreators, dispatch, getState, shouldComponentUpdate, ...rest} = instance;
 
   t.deepEqual(rest, {
     __state: resultingState,
-    actionCreators: {},
     options: DEFAULT_OPTIONS,
     state: resultingState,
   });
+
+  t.deepEqual(Object.keys(actionCreators), ['dispatch']);
+
+  t.is(typeof actionCreators.dispatch, 'function');
 
   t.is(typeof dispatch, 'function');
   t.is(typeof getState, 'function');
