@@ -37,6 +37,7 @@ module.exports = Object.assign({}, defaultConfig, {
         rule.loader === 'babel-loader'
           ? Object.assign({}, rule, {
             options: Object.assign({}, rule.options, {
+              plugins: ['@babel/plugin-proposal-class-properties', '@babel/plugin-syntax-class-properties'],
               presets: ['@babel/react'],
             }),
           })
