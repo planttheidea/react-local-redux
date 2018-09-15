@@ -80,29 +80,6 @@ export const assign = (target, ...sources) =>
   );
 
 /**
- * @function composeMiddleware
- *
- * @description
- * compose the middleware functions to a single function
- *
- * @param {Array<function>} fns the middleware functions to compose
- * @returns {function} the composed middleware
- */
-export const composeMiddleware = (fns) => {
-  if (!fns.length) {
-    return identity;
-  }
-
-  if (fns.length === 1) {
-    return fns[0];
-  }
-
-  const last = fns.splice(fns.length - 1, 1)[0];
-
-  return (...args) => reduce(fns.reverse(), (composed, f) => f(composed), last(...args));
-};
-
-/**
  * @function getFunctionNameRegexp
  *
  * @description

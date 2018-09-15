@@ -12,7 +12,7 @@ module.exports = {
 
   entry: [path.resolve(ROOT, 'src', 'index.js')],
 
-  externals: ['react', 'react-dom'],
+  externals: ['react', 'redux'],
 
   mode: 'development',
 

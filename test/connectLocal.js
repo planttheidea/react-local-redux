@@ -3,54 +3,12 @@ import test from 'ava';
 import {mount} from 'enzyme';
 import React from 'react';
 import sinon from 'sinon';
+import * as redux from 'redux';
+import thunk from 'redux-thunk';
 
 // src
 import * as connect from 'src/connectLocal';
 import {DEFAULT_OPTIONS} from 'src/constants';
-
-test('if createDispatch will create the dispatch method based on the middleware', (t) => {
-  const action = {type: 'type'};
-  const middleware = sinon.stub().returnsArg(0);
-
-  const instance = {
-    __state: {},
-    getState() {},
-    options: {
-      middlewares: [
-        ({dispatch, getState}) => {
-          t.is(getState, instance.getState);
-
-          t.is(typeof dispatch, 'function');
-
-          return middleware;
-        },
-      ],
-    },
-    setState: sinon.stub().callsFake((fn) => {
-      const result = fn();
-
-      t.is(result, instance.__state);
-    }),
-  };
-  const reducer = (state, action) => {
-    t.is(action.type, 'type');
-
-    return {
-      ...state,
-      extra: 'stuff',
-    };
-  };
-
-  const dispatch = connect.createDispatch(instance, reducer);
-
-  t.is(typeof dispatch, 'function');
-
-  const result = dispatch(action);
-
-  t.true(middleware.calledOnce);
-
-  t.is(result, action);
-});
 
 test('if createGetState will create a method that returns the synchronous state', (t) => {
   const instance = {
@@ -217,6 +175,18 @@ test('if createShouldComponentUpdate will return true if pure and mergedProps ch
   t.true(connect.createShouldComponentUpdate(instance)(nextProps, nextState, nextContext));
 });
 
+test('if createComponentWillUnmount will create a method that unsubscribes from the store and kill it', (t) => {
+  const instance = {
+    __store: {},
+    __unsubscribe: sinon.spy(),
+  };
+
+  connect.createComponentWillUnmount(instance)();
+
+  t.true(instance.__unsubscribe.calledOnce);
+  t.is(instance.__store, null);
+});
+
 test('if getActionCreators gets the actionCreators wrapped in dispatch', (t) => {
   const actionCreators = {
     fn: sinon.stub().returnsArg(0),
@@ -248,7 +218,7 @@ test('if onConstruct will assign the appropriate instance values', (t) => {
 
   const reducer = (state, action) => {
     t.is(state, undefined);
-    t.deepEqual(action, {});
+    t.is(typeof action.type, 'string');
 
     return resultingState;
   };
@@ -257,12 +227,28 @@ test('if onConstruct will assign the appropriate instance values', (t) => {
     fn: sinon.stub().returnsArg(0),
   };
 
-  connect.onConstruct(instance, reducer, actions, DEFAULT_OPTIONS);
+  connect.onConstruct(instance, reducer, actions);
 
-  const {actionCreators, dispatch, getState, shouldComponentUpdate, ...rest} = instance;
+  const {
+    actionCreators,
+    componentWillUnmount,
+    getState,
+    shouldComponentUpdate,
+    __store,
+    __unsubscribe,
+    ...rest
+  } = instance;
+
+  const fakeStore = redux.createStore(reducer);
+
+  t.deepEqual(Object.keys(__store), Object.keys(fakeStore));
+  Object.keys(fakeStore).forEach((key) => {
+    t.is(typeof __store[key], 'function');
+  });
+
+  t.is(typeof __unsubscribe, 'function');
 
   t.deepEqual(rest, {
-    __state: resultingState,
     options: DEFAULT_OPTIONS,
     state: resultingState,
   });
@@ -271,7 +257,78 @@ test('if onConstruct will assign the appropriate instance values', (t) => {
     t.is(typeof actionCreators[fn], 'function');
   });
 
-  t.is(typeof dispatch, 'function');
+  t.is(typeof componentWillUnmount, 'function');
+  t.is(typeof getState, 'function');
+  t.is(typeof shouldComponentUpdate, 'function');
+});
+
+test('if onConstruct will assign the appropriate instance values with custom options', (t) => {
+  const resultingState = {
+    state: 'value',
+  };
+
+  const instance = {};
+
+  const reducer = (state, action) => {
+    t.is(state, undefined);
+    t.is(typeof action.type, 'string');
+
+    return resultingState;
+  };
+
+  const actions = {
+    fn: sinon.stub().returnsArg(0),
+  };
+
+  const options = {
+    enhancer: sinon.stub().returnsArg(0),
+    middlewares: [thunk],
+    pure: false,
+  };
+
+  const applyMiddlewareSpy = sinon.spy(redux, 'applyMiddleware');
+
+  connect.onConstruct(instance, reducer, actions, options);
+
+  t.true(applyMiddlewareSpy.calledOnce);
+  t.true(applyMiddlewareSpy.calledWith(...options.middlewares));
+
+  applyMiddlewareSpy.restore();
+
+  t.true(options.enhancer.calledOnce);
+
+  const {
+    actionCreators,
+    componentWillUnmount,
+    getState,
+    shouldComponentUpdate,
+    __store,
+    __unsubscribe,
+    ...rest
+  } = instance;
+
+  const fakeStore = redux.createStore(reducer);
+
+  t.deepEqual(Object.keys(__store), Object.keys(fakeStore));
+  Object.keys(fakeStore).forEach((key) => {
+    t.is(typeof __store[key], 'function');
+  });
+
+  t.is(typeof __unsubscribe, 'function');
+
+  t.deepEqual(rest, {
+    options: {
+      ...DEFAULT_OPTIONS,
+      pure: false,
+    },
+    state: resultingState,
+  });
+
+  Object.keys(actionCreators).forEach((fn) => {
+    t.is(typeof actionCreators[fn], 'function');
+  });
+
+  t.is(typeof componentWillUnmount, 'function');
   t.is(typeof getState, 'function');
   t.is(typeof shouldComponentUpdate, 'function');
 });
@@ -285,26 +342,46 @@ test('if onConstruct will assign the appropriate instance values when there are 
 
   const reducer = (state, action) => {
     t.is(state, undefined);
-    t.deepEqual(action, {});
+    t.is(typeof action.type, 'string');
 
     return resultingState;
   };
 
   connect.onConstruct(instance, reducer, undefined, DEFAULT_OPTIONS);
 
-  const {actionCreators, dispatch, getState, shouldComponentUpdate, ...rest} = instance;
+  const {
+    actionCreators,
+    componentWillUnmount,
+    getState,
+    shouldComponentUpdate,
+    __store,
+    __unsubscribe,
+    ...rest
+  } = instance;
+
+  const fakeStore = redux.createStore(reducer);
+
+  t.deepEqual(Object.keys(__store), Object.keys(fakeStore));
+  Object.keys(fakeStore).forEach((key) => {
+    t.is(typeof __store[key], 'function');
+  });
+
+  t.is(typeof __unsubscribe, 'function');
 
   t.deepEqual(rest, {
-    __state: resultingState,
     options: DEFAULT_OPTIONS,
     state: resultingState,
+  });
+
+  Object.keys(actionCreators).forEach((fn) => {
+    t.is(typeof actionCreators[fn], 'function');
   });
 
   t.deepEqual(Object.keys(actionCreators), ['dispatch']);
 
   t.is(typeof actionCreators.dispatch, 'function');
 
-  t.is(typeof dispatch, 'function');
+  t.is(typeof componentWillUnmount, 'function');
   t.is(typeof getState, 'function');
   t.is(typeof shouldComponentUpdate, 'function');
 });
