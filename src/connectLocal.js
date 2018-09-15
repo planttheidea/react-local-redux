@@ -4,6 +4,10 @@ import {
   Component,
   createElement,
 } from 'react';
+import {
+  applyMiddleware,
+  createStore,
+} from 'redux';
 
 // constants
 import {DEFAULT_OPTIONS} from './constants';
@@ -11,35 +15,10 @@ import {DEFAULT_OPTIONS} from './constants';
 // utils
 import {
   assign,
-  composeMiddleware,
   getDisplayName,
+  identity,
   reduce,
 } from './utils';
-
-/**
- * @function createDispatch
- *
- * @description
- * create the dispatch method for the component
- *
- * @param {ReactComponent} instance the component instance
- * @param {function} reducer the reducer method
- * @returns {function(Object): void} the dispatch method for the component
- */
-export const createDispatch = (instance, reducer) => {
-  const dispatch = (action) => {
-    instance.__state = reducer(instance.__state, action);
-    instance.setState(() => instance.__state);
-
-    return action;
-  };
-  const middlewareApi = {
-    dispatch,
-    getState: instance.getState,
-  };
-
-  return composeMiddleware(instance.options.middlewares.map((middleware) => middleware(middlewareApi)))(dispatch);
-};
 
 export const createGetState = (instance) =>
   /**
@@ -89,6 +68,18 @@ export const createShouldComponentUpdate = (instance) =>
     );
   };
 
+export const createComponentWillUnmount = (instance) =>
+  /**
+   * @function componentWillMount
+   *
+   * @description
+   * on unmount, unsubscribe from the store and remove it
+   */
+  () => {
+    instance.__unsubscribe();
+    instance.__store = null;
+  };
+
 /**
  * @function getActionCreators
  *
@@ -119,29 +110,35 @@ export const getActionCreators = (actionCreators, dispatch) =>
  * @param {ReactComponent} instance the component instance
  * @param {function} reducer the reducer with state
  * @param {Object} actionCreators the actionCreators to wrap with dispatch
+ * @param {function} [enhancer=identity] the method to create the store enhancer
+ * @param {Array<function>} [middlewares=[]] the list of middlewares to apply
  * @param {Object} options additional options for the component
  */
-export const onConstruct = (instance, reducer, actionCreators, options) => {
-  // state
-  instance.state = reducer(undefined, {});
-  instance.__state = instance.state;
-
+export const onConstruct = (
+  instance,
+  reducer,
+  actionCreators,
+  {enhancer = identity, middlewares = [], ...options} = {}
+) => {
   // options
   instance.options = assign({}, DEFAULT_OPTIONS, options);
 
+  // store
+  instance.__store = createStore(reducer, enhancer(applyMiddleware(...middlewares)));
+  instance.__unsubscribe = instance.__store.subscribe(() => instance.setState(() => instance.__store.getState()));
+
   // lifecycle methods
   instance.shouldComponentUpdate = createShouldComponentUpdate(instance);
+  instance.componentWillUnmount = createComponentWillUnmount(instance);
 
   // instance methods
   instance.getState = createGetState(instance);
-  instance.dispatch = createDispatch(instance, reducer);
 
   // instance values
   instance.actionCreators = actionCreators
-    ? getActionCreators(actionCreators, instance.dispatch)
-    : {
-      dispatch: instance.dispatch,
-    };
+    ? getActionCreators(actionCreators, instance.__store.dispatch)
+    : {dispatch: instance.__store.dispatch};
+  instance.state = instance.__store.getState();
 };
 
 /**

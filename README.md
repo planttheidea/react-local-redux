@@ -16,7 +16,7 @@ Manage component-specific state as you would global state via redux
 
 The [`redux`](https://github.com/reduxjs/redux) library has changed the way that we manage state within our JavaScript applications, and is a wonderful tool. Like many great tools, though, developers see it as a hammer in a world of nails, using `redux` for all state regardless of whether it should be global or not. The creator of `redux` himself [has even written about how `redux` should be used selectively](https://medium.com/@dan_abramov/you-might-not-need-redux-be46360cf367), because `redux` is meant for global state.
 
-`react-local-redux` tries to strike a balance, leveraging the powers of the `redux` paradigm but keeping state that does not need to be global scoped to the component that it should live in by creating a higher-order component that operates like a local store. It's usage should come naturally to those who have used [`react-redux`](https://github.com/reduxjs/react-redux), you can [use `redux` middlewares](#options), and there are even helpers to remove boilerplate related to building [action creators](#createactioncreator) and [reducers](#createreducer).
+`react-local-redux` tries to strike a balance, leveraging the powers of the `redux` paradigm but keeping state that does not need to be global scoped to the component that it should live in by creating a higher-order component that operates like a local store. It's usage should come naturally to those who have used [`react-redux`](https://github.com/reduxjs/react-redux), you can [use `redux` middlewares and enhancers](#options), and there are even helpers to remove boilerplate related to building [action creators](#createactioncreator) and [reducers](#createreducer).
 
 ## Usage
 
@@ -72,20 +72,37 @@ Decorator that accepts a `reducer` function and a map of functions as `actionCre
 
 Like `connect` in `react-redux`, you can pass an object of `options` to customize how `connectLocal` will operate:
 
-- `pure` => is the component considered a "pure" component, meaning does it only update when props / state / context has changed based on strict equality
-- `areOwnPropsEqual` => custom props equality comparator
-- `areStatesEqual` => custom states equality comparator
-- `areMergedPropsEqual` => custom equality comparator for the merged state, actionCreators, and props passed to the component
+- `pure: boolean`
+  - is the component considered a "pure" component, meaning does it only update when props / state / context has changed based on strict equality
+- `areOwnPropsEqual(currentProps: Object, nextProps: Object): boolean`
+  - custom props equality comparator
+- `areStatesEqual(currentState: Object, nextState: Object): boolean`
+  - custom states equality comparator
+- `areStatesEqual(mergedProps: Object, nextMergedProps: Object): boolean`
+  - custom equality comparator for the merged state, actionCreators, and props passed to the component
 
 Additionally, there are some options specific to `connectLocal` that provide more functionality:
 
-- `middlewares` => array of redux middlewares to be appled to the `dispatch` method
+- `enhancer(fn: function): function`
+  - store enhancer used in `redux.createStore()`
+
+```javascript
+@connectLocal(reducer, actionCreators, {
+  enhancer: window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__({
+    name: 'MySpecialComponent'
+  })
+})
+```
+
+- `middlewares: Array<function>`
+  - array of redux middlewares to be appled to the `dispatch` method
 
 ```javascript
 @connectLocal(reducer, actionCreators, {middlewares: [reduxThunk]})
 ```
 
-- `mergeProps` => custom method to merge state, actionCreators, and props into the props passed to the component
+- `mergeProps(state: Object, actionCreators: Object, props: Object): Object`
+  - custom method to merge state, actionCreators, and props into the props passed to the component
 
 ## Additional imports
 

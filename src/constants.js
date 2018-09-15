@@ -12,6 +12,5 @@ export const DEFAULT_OPTIONS = {
   areOwnPropsEqual: shallowEqual,
   areStatesEqual: shallowEqual,
   mergeProps: getMergedProps,
-  middlewares: [],
   pure: true,
 };

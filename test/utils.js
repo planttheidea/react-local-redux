@@ -41,45 +41,6 @@ test('if assign will work the same way as the native assign', (t) => {
   t.deepEqual(result, Object.assign({}, source1, source2, source3));
 });
 
-test('if composeMiddleware will return identity if no functions are passed', (t) => {
-  const fns = [];
-
-  const result = utils.composeMiddleware(fns);
-
-  t.is(result, utils.identity);
-});
-
-test('if composeMiddleware will return the only function passed', (t) => {
-  const middleware = () => {};
-
-  const fns = [middleware];
-
-  const result = utils.composeMiddleware(fns);
-
-  t.is(result, middleware);
-});
-
-test('if composeMiddleware will return the composed methods', (t) => {
-  const middleware1 = sinon.stub().returnsArg(0);
-  const middleware2 = sinon.stub().returnsArg(0);
-
-  const fns = [middleware1, middleware2];
-
-  const result = utils.composeMiddleware(fns);
-
-  t.is(typeof result, 'function');
-
-  const fn = utils.identity;
-
-  result(fn);
-
-  t.true(middleware1.calledOnce);
-  t.true(middleware1.calledWith(fn));
-
-  t.true(middleware2.calledOnce);
-  t.true(middleware2.calledWith(fn));
-});
-
 test('if getFunctionNameRegexp will get the name of the function when it exists', (t) => {
   function foo() {}
 
