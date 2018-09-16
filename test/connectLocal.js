@@ -21,8 +21,10 @@ test('if createGetState will create a method that returns the synchronous state'
 });
 
 test('if createShouldComponentUpdate will return true if not pure', (t) => {
+  const actionCreators = {};
+
   const instance = {
-    actionCreators: {},
+    actionCreators,
     context: {},
     options: {
       ...DEFAULT_OPTIONS,
@@ -46,8 +48,10 @@ test('if createShouldComponentUpdate will return true if not pure', (t) => {
 });
 
 test('if createShouldComponentUpdate will return false if pure and nothing changed', (t) => {
+  const actionCreators = {};
+
   const instance = {
-    actionCreators: {},
+    actionCreators,
     context: {},
     options: {
       ...DEFAULT_OPTIONS,
@@ -70,8 +74,10 @@ test('if createShouldComponentUpdate will return false if pure and nothing chang
 });
 
 test('if createShouldComponentUpdate will return true if pure and ownProps changed', (t) => {
+  const actionCreators = {};
+
   const instance = {
-    actionCreators: {},
+    actionCreators,
     context: {},
     options: {
       ...DEFAULT_OPTIONS,
@@ -94,9 +100,11 @@ test('if createShouldComponentUpdate will return true if pure and ownProps chang
   t.true(connect.createShouldComponentUpdate(instance)(nextProps, nextState, nextContext));
 });
 
-test('if createShouldComponentUpdate will return true if pur`e` and state changed', (t) => {
+test('if createShouldComponentUpdate will return true if pure and state changed', (t) => {
+  const actionCreators = {};
+
   const instance = {
-    actionCreators: {},
+    actionCreators,
     context: {},
     options: {
       ...DEFAULT_OPTIONS,
@@ -120,8 +128,10 @@ test('if createShouldComponentUpdate will return true if pur`e` and state change
 });
 
 test('if createShouldComponentUpdate will return true if pure and context changed', (t) => {
+  const actionCreators = {};
+
   const instance = {
-    actionCreators: {},
+    actionCreators,
     context: {},
     options: {
       ...DEFAULT_OPTIONS,
@@ -175,6 +185,127 @@ test('if createShouldComponentUpdate will return true if pure and mergedProps ch
   t.true(connect.createShouldComponentUpdate(instance)(nextProps, nextState, nextContext));
 });
 
+test('if createShouldComponentUpdate will update the instance actionCreators if actionCreators is a function', (t) => {
+  let count = 0;
+
+  const nextProps = {
+    foo: 'bar',
+  };
+
+  const instance = {};
+
+  const actionCreators = sinon.stub().callsFake((dispatch, ownProps) => {
+    t.is(dispatch, instance.__store.dispatch);
+    t.is(ownProps, nextProps);
+
+    return {};
+  });
+
+  const instanceValues = {
+    __store: {
+      dispatch() {},
+    },
+    actionCreators: {},
+    context: {},
+    dispatch() {},
+    options: {
+      ...DEFAULT_OPTIONS,
+    },
+    props: {},
+    state: {},
+  };
+
+  Object.keys(instanceValues).forEach((key) => (instance[key] = instanceValues[key]));
+
+  const nextState = {
+    ...instance.state,
+  };
+  const nextContext = {
+    ...instance.context,
+  };
+
+  connect.createShouldComponentUpdate(instance, actionCreators)(nextProps, nextState, nextContext);
+
+  t.true(actionCreators.calledOnce);
+});
+
+test('if createShouldComponentUpdate will update the instance actionCreators if actionCreators is a function and pure is false', (t) => {
+  let count = 0;
+
+  const nextProps = {};
+
+  const instance = {};
+
+  const actionCreators = sinon.stub().callsFake((dispatch, ownProps) => {
+    t.is(dispatch, instance.__store.dispatch);
+    t.is(ownProps, nextProps);
+
+    return {};
+  });
+
+  const instanceValues = {
+    __store: {
+      dispatch() {},
+    },
+    actionCreators: {},
+    context: {},
+    dispatch() {},
+    options: {
+      ...DEFAULT_OPTIONS,
+      pure: false,
+    },
+    props: {},
+    state: {},
+  };
+
+  Object.keys(instanceValues).forEach((key) => (instance[key] = instanceValues[key]));
+
+  const nextState = {
+    ...instance.state,
+  };
+  const nextContext = {
+    ...instance.context,
+  };
+
+  connect.createShouldComponentUpdate(instance, actionCreators)(nextProps, nextState, nextContext);
+
+  t.true(actionCreators.calledOnce);
+});
+
+test('if createShouldComponentUpdate will not update the instance actionCreators if actionCreators is a function and props have not changed', (t) => {
+  let count = 0;
+
+  const actionCreators = sinon.spy();
+
+  const instance = {
+    __store: {
+      dispatch() {},
+    },
+    actionCreators: {},
+    context: {},
+    dispatch() {},
+    options: {
+      ...DEFAULT_OPTIONS,
+    },
+    props: {},
+    state: {},
+  };
+
+  const nextProps = {
+    ...instance.props,
+  };
+  const nextState = {
+    ...instance.state,
+  };
+  const nextContext = {
+    ...instance.context,
+  };
+
+  connect.createShouldComponentUpdate(instance, actionCreators)(nextProps, nextState, nextContext);
+
+  t.true(actionCreators.notCalled);
+});
+
 test('if createComponentWillUnmount will create a method that unsubscribes from the store and kill it', (t) => {
   const instance = {
     __store: {},
@@ -185,28 +316,6 @@ test('if createComponentWillUnmount will create a method that unsubscribes from 
 
   t.true(instance.__unsubscribe.calledOnce);
   t.is(instance.__store, null);
-});
-
-test('if getActionCreators gets the actionCreators wrapped in dispatch', (t) => {
-  const actionCreators = {
-    fn: sinon.stub().returnsArg(0),
-  };
-  const dispatch = sinon.stub().returnsArg(0);
-
-  const result = connect.getActionCreators(actionCreators, dispatch);
-
-  t.is(typeof result, 'object');
-  t.deepEqual(Object.keys(result), ['fn']);
-
-  const args = ['foo', 123, {}];
-
-  result.fn(...args);
-
-  t.true(actionCreators.fn.calledOnce);
-  t.true(actionCreators.fn.calledWith(...args));
-
-  t.true(dispatch.calledOnce);
-  t.true(dispatch.calledWith(args[0]));
 });
 
 test('if onConstruct will assign the appropriate instance values', (t) => {

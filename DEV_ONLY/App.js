@@ -6,6 +6,7 @@ import React, {Component} from 'react';
 
 // components
 import Counter from './Counter';
+import Number from './Number';
 
 class App extends Component {
   state = {
@@ -16,6 +17,10 @@ class App extends Component {
 
   render() {
     const {isMounted} = this.state;
+
+    const number = ~~(Math.random() * 100);
+
+    console.log(number);
 
     return (
       <div>
@@ -30,6 +35,8 @@ class App extends Component {
         <Counter />
 
         {isMounted && <Counter />}
+
+        <Number multiplier={number} />
       </div>
     );
   }

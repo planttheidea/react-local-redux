@@ -41,6 +41,44 @@ test('if assign will work the same way as the native assign', (t) => {
   t.deepEqual(result, Object.assign({}, source1, source2, source3));
 });
 
+test('if getActionCreators gets the actionCreators wrapped in dispatch when an object', (t) => {
+  const actionCreators = {
+    fn: sinon.stub().returnsArg(0),
+  };
+  const dispatch = sinon.stub().returnsArg(0);
+  const ownProps = {};
+
+  const result = utils.getActionCreators(actionCreators, dispatch, ownProps);
+
+  t.is(typeof result, 'object');
+  t.deepEqual(Object.keys(result), ['fn']);
+
+  const args = ['foo', 123, {}];
+
+  result.fn(...args);
+
+  t.true(actionCreators.fn.calledOnce);
+  t.true(actionCreators.fn.calledWith(...args));
+
+  t.true(dispatch.calledOnce);
+  t.true(dispatch.calledWith(args[0]));
+});
+
+test('if getActionCreators will call actionCreators with dispatch and the component props when a function', (t) => {
+  const actions = {};
+
+  const actionCreators = sinon.stub().returns(actions);
+  const dispatch = () => {};
+  const ownProps = {};
+
+  const result = utils.getActionCreators(actionCreators, dispatch, ownProps);
+
+  t.true(actionCreators.calledOnce);
+  t.true(actionCreators.calledWith(dispatch, ownProps));
+
+  t.is(result, actions);
+});
+
 test('if getFunctionNameRegexp will get the name of the function when it exists', (t) => {
   function foo() {}
 

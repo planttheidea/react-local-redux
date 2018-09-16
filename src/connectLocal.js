@@ -15,9 +15,9 @@ import {DEFAULT_OPTIONS} from './constants';
 // utils
 import {
   assign,
+  getActionCreators,
   getDisplayName,
   identity,
-  reduce,
 } from './utils';
 
 export const createGetState = (instance) =>
@@ -31,7 +31,7 @@ export const createGetState = (instance) =>
    */
   () => instance.__state;
 
-export const createShouldComponentUpdate = (instance) =>
+export const createShouldComponentUpdate = (instance, actionCreators) =>
   /**
    * @function shouldComponentUpdate
    *
@@ -45,12 +45,17 @@ export const createShouldComponentUpdate = (instance) =>
    */
   (nextProps, nextState, nextContext) => {
     const {
-      actionCreators,
+      __store,
+      actionCreators: wrappedActionCreators,
       context,
       options: {areMergedPropsEqual, areOwnPropsEqual, areStatesEqual, mergeProps, pure},
       props,
       state,
     } = instance;
+
+    if (typeof actionCreators === 'function' && (!pure || !areOwnPropsEqual(props, nextProps))) {
+      instance.actionCreators = getActionCreators(actionCreators, __store.dispatch, nextProps);
+    }
 
     if (!pure) {
       return true;
@@ -62,8 +67,8 @@ export const createShouldComponentUpdate = (instance) =>
       || !shallowEqual(context, nextContext)
       || !areMergedPropsEqual(
         // eslint workaround
-        mergeProps(state, actionCreators, props),
-        mergeProps(nextState, actionCreators, nextProps)
+        mergeProps(state, wrappedActionCreators, props),
+        mergeProps(nextState, instance.actionCreators, nextProps)
       )
     );
   };
@@ -79,27 +84,6 @@ export const createComponentWillUnmount = (instance) =>
     instance.__unsubscribe();
     instance.__store = null;
   };
-
-/**
- * @function getActionCreators
- *
- * @description
- * get the actionCreators wrapped with the dispatch method
- *
- * @param {Object} actionCreators the actionCreators to wrap
- * @param {function} dispatch the instance-specific dispatch function
- * @returns {Object} the wrapped actionCreators
- */
-export const getActionCreators = (actionCreators, dispatch) =>
-  reduce(
-    Object.keys(actionCreators),
-    (wrappedActionCreators, name) => {
-      wrappedActionCreators[name] = (...args) => dispatch(actionCreators[name](...args));
-
-      return wrappedActionCreators;
-    },
-    {}
-  );
 
 /**
  * @function onConstruct
@@ -128,7 +112,7 @@ export const onConstruct = (
   instance.__unsubscribe = instance.__store.subscribe(() => instance.setState(() => instance.__store.getState()));
 
   // lifecycle methods
-  instance.shouldComponentUpdate = createShouldComponentUpdate(instance);
+  instance.shouldComponentUpdate = createShouldComponentUpdate(instance, actionCreators);
   instance.componentWillUnmount = createComponentWillUnmount(instance);
 
   // instance methods
@@ -136,7 +120,7 @@ export const onConstruct = (
 
   // instance values
   instance.actionCreators = actionCreators
-    ? getActionCreators(actionCreators, instance.__store.dispatch)
+    ? getActionCreators(actionCreators, instance.__store.dispatch, instance.props)
     : {dispatch: instance.__store.dispatch};
   instance.state = instance.__store.getState();
 };

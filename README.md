@@ -64,9 +64,17 @@ class App extends Component {
 
 ## connectLocal
 
-`connectLocal(reducer: function[, actionCreators: Object[, options: Object]]) => (ComponentToWrap: ReactComponent): ReactComponent`
+`connectLocal(reducer: function[, actionCreators: (function|Object)[, options: Object]]) => (ComponentToWrap: ReactComponent): ReactComponent`
 
-Decorator that accepts a `reducer` function and a map of functions as `actionCreators`, returning a function that accepts a `ReactComponent` and returns a higher-order `ReactComponent`. Internally the `reducer` will be used as local state, with each of the `actionCreators` being used to update that state. Both the local state and the wrapped `actionCreators` will be passed to the `ComponentToWrap` as props, very much align the lines of `connect` in the `react-redux` package. If no `actionCreators` are passed, the `dispatch` method itself will be passed as a prop to the `ComponentToWrap`.
+Decorator that accepts a `reducer` function and `actionCreators`, returning a function that accepts a `ReactComponent` and returns a higher-order `ReactComponent`.
+
+If `actionCreators` is an object of functions, it will automatically wrap those functions in `dispatch`, and if it is a function then it will handle the following contract:
+
+`actionCreators(dispatch: function, ownProps: Object): Object`
+
+This should operate the exact same as `mapDispatchToProps` in `react-redux`.
+
+Internally the `reducer` will be used as local state, with each of the `actionCreators` being used to update that state. Both the local state and the wrapped `actionCreators` will be passed to the `ComponentToWrap` as props, very much align the lines of `connect` in the `react-redux` package. If no `actionCreators` are passed, the `dispatch` method itself will be passed as a prop to the `ComponentToWrap`.
 
 #### options
 

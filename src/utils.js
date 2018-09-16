@@ -80,6 +80,29 @@ export const assign = (target, ...sources) =>
   );
 
 /**
+ * @function getActionCreators
+ *
+ * @description
+ * get the actionCreators wrapped with the dispatch method
+ *
+ * @param {function|Object} actionCreators the actionCreators to wrap
+ * @param {function} dispatch the instance-specific dispatch function
+ * @returns {Object} the wrapped actionCreators
+ */
+export const getActionCreators = (actionCreators, dispatch, ownProps) =>
+  typeof actionCreators === 'function'
+    ? actionCreators(dispatch, ownProps)
+    : reduce(
+      Object.keys(actionCreators),
+      (wrappedActionCreators, name) => {
+        wrappedActionCreators[name] = (...args) => dispatch(actionCreators[name](...args));
+
+        return wrappedActionCreators;
+      },
+      {}
+    );
+
+/**
  * @function getFunctionNameRegexp
  *
  * @description
