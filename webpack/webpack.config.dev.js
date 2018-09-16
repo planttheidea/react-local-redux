@@ -12,18 +12,21 @@ module.exports = Object.assign({}, defaultConfig, {
   cache: true,
 
   devServer: {
-    clientLogLevel: 'none',
     compress: true,
     contentBase: './dist',
-    host: 'localhost',
     inline: true,
     lazy: false,
     noInfo: false,
     port: PORT,
     quiet: false,
     stats: {
+      assets: false,
+      chunkModules: false,
+      chunks: true,
       colors: true,
-      progress: true,
+      hash: false,
+      timings: true,
+      version: false,
     },
   },
 
