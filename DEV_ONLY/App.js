@@ -13,8 +13,6 @@ class App extends Component {
     isMounted: false,
   };
 
-  getRef = (instance) => console.log(instance) || console.log(instance.getWrappedInstance());
-
   toggleMounted = () => this.setState(({isMounted}) => ({isMounted: !isMounted}));
 
   render() {
@@ -32,7 +30,7 @@ class App extends Component {
           <button onClick={this.toggleMounted}>Toggle mounted</button>
         </div>
 
-        <Counter ref={this.getRef} />
+        <Counter />
         <Counter />
         <Counter />
 
