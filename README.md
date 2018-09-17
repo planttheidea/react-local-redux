@@ -50,9 +50,11 @@ const reducer = (state = { count: 0 }, action) => {
 @connectLocal(reducer, actionCreators)
 class App extends Component {
   render() {
+    const {count, decrement, increment} = this.props;
+    
     return (
       <div>
-        <div>Count: {this.props.count}</div>
+        <div>Count: {count}</div>
 
         <button onClick={decrement}>Decrement</button>
         <button onClick={increment}>Increment</button>
