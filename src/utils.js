@@ -1,3 +1,5 @@
+const hasOwnProperty = Object.prototype.hasOwnProperty;
+
 /**
  * @function identity
  *
@@ -19,6 +21,27 @@ export const identity = (value) => value;
  * @returns {boolean} is the value passed undefined
  */
 export const isUndefined = (value) => value === void 0;
+
+/**
+ * @function keys
+ *
+ * @description
+ * get the keys of the object (faster than Object.keys())
+ *
+ * @param {Object} object the object to get the keys from
+ * @returns {Array<string>} the keys of the object
+ */
+export const keys = (object) => {
+  const objectKeys = [];
+
+  for (let key in object) {
+    if (hasOwnProperty.call(object, key)) {
+      objectKeys.push(key);
+    }
+  }
+
+  return objectKeys;
+};
 
 /**
  * @function noop
@@ -67,7 +90,7 @@ export const assign = (target, ...sources) =>
     (assigned, source) =>
       typeof source === 'object'
         ? reduce(
-          Object.keys(source),
+          keys(source),
           (assignedSource, key) => {
             assignedSource[key] = source[key];
 
@@ -89,18 +112,23 @@ export const assign = (target, ...sources) =>
  * @param {function} dispatch the instance-specific dispatch function
  * @returns {Object} the wrapped actionCreators
  */
-export const getActionCreators = (actionCreators, dispatch, ownProps) =>
-  typeof actionCreators === 'function'
-    ? actionCreators(dispatch, ownProps)
-    : reduce(
-      Object.keys(actionCreators),
-      (wrappedActionCreators, name) => {
-        wrappedActionCreators[name] = (...args) => dispatch(actionCreators[name](...args));
+export const getActionCreators = (actionCreators, dispatch, ownProps) => {
+  const actionCreatorsTypeof = typeof actionCreators;
 
-        return wrappedActionCreators;
-      },
-      {}
-    );
+  return actionCreatorsTypeof === 'function'
+    ? actionCreators(dispatch, ownProps)
+    : actionCreators && actionCreatorsTypeof === 'object'
+      ? reduce(
+        keys(actionCreators),
+        (wrappedActionCreators, name) => {
+          wrappedActionCreators[name] = (...args) => dispatch(actionCreators[name](...args));
+
+          return wrappedActionCreators;
+        },
+        {}
+      )
+      : {dispatch};
+};
 
 /**
  * @function getFunctionNameRegexp

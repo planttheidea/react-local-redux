@@ -21,6 +21,19 @@ test('if noop will return undefined', (t) => {
   t.is(result, undefined);
 });
 
+test('if keys will work just as Object.keys', (t) => {
+  const object = {
+    bar: 'baz',
+    foo: 'bar',
+    [Symbol('baz')]: 'quz',
+  };
+
+  const result = utils.keys(object);
+
+  t.deepEqual(result, ['bar', 'foo']);
+  t.deepEqual(result, Object.keys(object));
+});
+
 test('if reduce will work the same way as the native reduce', (t) => {
   const array = [1, 2, 3, 4, 5, 6];
   const fn = (sum, value) => sum + value;
