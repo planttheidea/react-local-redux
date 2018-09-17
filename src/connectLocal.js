@@ -119,9 +119,7 @@ export const onConstruct = (
   instance.getState = createGetState(instance);
 
   // instance values
-  instance.actionCreators = actionCreators
-    ? getActionCreators(actionCreators, instance.__store.dispatch, instance.props)
-    : {dispatch: instance.__store.dispatch};
+  instance.actionCreators = getActionCreators(actionCreators, instance.__store.dispatch, instance.props);
   instance.state = instance.__store.getState();
 };
 
